@@ -9,7 +9,7 @@ router.get("/hawkers", (req, res) => {
     // console.log(objGlobal.getConnection());
     const connection = objGlobal.getConnection();
     //console.log(connection);
-    const queryString = "SELECT H.HawkerId,H.HawkerName,H.Mobile,H.Email,H.Address,H.AreaName,H.City,H.CreationDate,H.SchemeId,S.Scheme,H.UserId FROM Hawkers H INNER JOIN Schemes S ON H.SchemeId=S.SchemeId"
+    const queryString = "SELECT H.HawkerId,H.HawkerName,H.Mobile,H.Email,H.Address,H.AreaName,H.City,H.CreationDate,H.SchemeId,H.SchemeCopy,S.Scheme,H.UserId,H.BaseCopy,H.StartDate,H.EndDate FROM Hawkers H INNER JOIN Schemes S ON H.SchemeId=S.SchemeId"
 
     connection.query(queryString, (err, rows, fields) => {
         if (err) {
@@ -25,7 +25,7 @@ router.get("/hawkers", (req, res) => {
 router.get("/hawkers/:id", (req, res) => {
     const connection = objGlobal.getConnection();
     const userId = req.params.id;
-    const queryString = "SELECT H.HawkerId,H.HawkerName,H.Mobile,H.Email,H.Address,H.AreaName,H.City,H.CreationDate,H.SchemeId,S.Scheme,H.UserId FROM Hawkers H INNER JOIN Schemes S ON H.SchemeId=S.SchemeId WHERE HawkerId=?";
+    const queryString = "SELECT H.HawkerId,H.HawkerName,H.Mobile,H.Email,H.Address,H.AreaName,H.City,H.CreationDate,H.SchemeId,H.SchemeCopy,S.Scheme,H.UserId,H.BaseCopy,H.StartDate,H.EndDate FROM Hawkers H INNER JOIN Schemes S ON H.SchemeId=S.SchemeId WHERE HawkerId=?";
     connection.query(queryString, [userId], (err, rows, fields) => {
         if (err) {
             console.log("failed to query for Hawkers: " + err)
@@ -72,18 +72,22 @@ router.post("/hawkers/add", (req, resp) => {
     const hawkerName = req.body.HawkerName;
     const mobile = req.body.Mobile;
     const email = req.body.Email;
-    const address = (req.body.Address==null || req.body.Address==undefined) ? '':req.body.Address;
+    const address = (req.body.Address == null || req.body.Address == undefined) ? '' : req.body.Address;
     const areaname = req.body.AreaName;
     const schemeId = req.body.SchemeId;
     const city = req.body.City;
+    const basecopy = (req.body.BaseCopy == null || req.body.BaseCopy == undefined) ? '' : req.body.BaseCopy;
+    const startDate = req.body.StartDate;
+    const endDate = req.body.EndDate;
+    const schemeCopy = req.body.SchemeCopy;
     var dt = creationDate.create();
     // console.log(dt);
     // console.log(dt._now);
     // console.log( dt.format('Y-m-d H:M:S'));
     // var formatted = dt.format('Y-m-d H:M:S');
     const userId = req.body.UserId;
-    const queryString = "INSERT INTO Hawkers(HawkerName,Mobile,Email,Address,AreaName,City,CreationDate,SchemeId,UserId) VALUES (?,?,?,?,?,?,?,?,?)";
-    connection.query(queryString, [hawkerName, mobile, email, address, areaname, city, dt._now, schemeId, userId], (err, results, fields) => {
+    const queryString = "INSERT INTO Hawkers(HawkerName,Mobile,Email,Address,AreaName,City,CreationDate,SchemeId,UserId,BaseCopy,StartDate,EndDate,SchemeCopy) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)";
+    connection.query(queryString, [hawkerName, mobile, email, address, areaname, city, dt._now, schemeId, userId, basecopy, startDate, endDate, schemeCopy], (err, results, fields) => {
         if (err) {
             console.log("failed to query for Hawkers: " + err);
             resp.sendStatus(500);
@@ -101,18 +105,24 @@ router.post("/hawkers/edit", (req, resp) => {
     const hawkerName = req.body.HawkerName;
     const mobile = req.body.Mobile;
     const email = req.body.Email;
-    const address = (req.body.Address==null || req.body.Address==undefined) ? '':req.body.Address;
+    const address = (req.body.Address == null || req.body.Address == undefined) ? '' : req.body.Address;
     const areaname = req.body.AreaName;
     const schemeId = req.body.SchemeId;
     const city = req.body.City;
+    const basecopy = (req.body.BaseCopy == null || req.body.BaseCopy == undefined) ? '' : req.body.BaseCopy;
+    const startDate = req.body.StartDate;
+    const endDate = req.body.EndDate;
+    const schemeCopy = req.body.SchemeCopy;
     var dt = creationDate.create();
     // console.log(dt);
     // console.log(dt._now);
     // console.log( dt.format('Y-m-d H:M:S'));
     // var formatted = dt.format('Y-m-d H:M:S');
     const userId = req.body.UserId;
-    const queryString = "UPDATE Hawkers SET HawkerName=?,Mobile=?,Email=?,Address=?,AreaName=?,City=?,SchemeId=? WHERE HawkerId=?";
-    connection.query(queryString, [hawkerName, mobile, email, address, areaname, city, schemeId, hawkerId], (err, results, fields) => {
+    const queryString = "UPDATE Hawkers SET HawkerName=?,Mobile=?,Email=?,Address=?,AreaName=?,City=?,SchemeId=?,BaseCopy=?,StartDate=?,EndDate=?,SchemeCopy=? WHERE HawkerId=?";
+    console.log(startDate);
+    console.log(queryString);
+    connection.query(queryString, [hawkerName, mobile, email, address, areaname, city, schemeId, basecopy, startDate, endDate, schemeCopy, hawkerId], (err, results, fields) => {
         if (err) {
             console.log("failed to query for Hawkers: " + err);
             resp.sendStatus(500);

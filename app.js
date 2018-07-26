@@ -8,6 +8,7 @@ const newOrderRouter = require('./Routes/NewOrder.js')
 const newsPaperRouter = require('./Routes/NewsPaper.js')
 const schemeRouter = require('./Routes/Scheme.js')
 const surveyRouter = require('./Routes/Survey.js')
+const customerschemeRouter = require('./Routes/CustomerScheme.js')
 const roleRouter = require('./Routes/Role.js')
 const menuRouter = require('./Routes/Menu.js')
 const roleMenuRouter = require('./Routes/RoleMenu.js')
@@ -48,3 +49,4 @@ app.use(surveyRouter);
 app.use(roleRouter);
 app.use(menuRouter);
 app.use(roleMenuRouter);
+app.use(customerschemeRouter);

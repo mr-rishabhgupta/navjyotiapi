@@ -174,7 +174,7 @@ router.post("/users/login", (req, resp) => {
             resp.sendStatus(403)
             return
         } else {
-            if (results[0].IsEnable == false) {
+            if (results!=null && results!=undefined && results.length>0 && results[0].IsEnable == false) {
                 console.log("Invalid Access: " + email)
                 resp.sendStatus(401)
                 return
@@ -200,7 +200,6 @@ router.get("/userstatuschange/:id", (req, resp) => {
         resp.sendStatus(202);
     })
 })
-
 router.get("/homecounts", (req, resp) => {
     console.log(req.body);
     const connection = objGlobal.getConnection();

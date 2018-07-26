@@ -22,6 +22,23 @@ router.get("/neworders", (req, res) => {
     //res.end();
 })
 
+router.get("/newordersdetail", (req, res) => {
+    // console.log(objGlobal.getConnection());
+    const connection = objGlobal.getConnection();
+    //console.log(connection);
+    const queryString = "SELECT N.*,CASE WHEN C.CustomerScheme IS NULL THEN '' ELSE C.CustomerScheme END AS CustomerScheme FROM NewOrders N LEFT JOIN CustomerSchemes C ON N.CustomerSchemeId=C.CustomerSchemeId;"
+
+    connection.query(queryString, (err, rows, fields) => {
+        if (err) {
+            console.log("Failed to query for NewOrders: " + err)
+            res.sendStatus(500)
+            return
+        }
+        res.json(rows)
+    })
+    //res.end();
+})
+
 router.get("/neworders/:id", (req, res) => {
     const connection = objGlobal.getConnection();
     const userId = req.params.id;
@@ -82,13 +99,14 @@ router.post("/neworders/add", (req, resp) => {
     const endDate = req.body.EndDate;
     const orderDate = req.body.OrderDate;
     var entrydate = req.body.EntryDate;
+    const customerschemeId = req.body.CustomerSchemeId;
     // console.log(dt);
     // console.log(dt._now);
     // console.log( dt.format('Y-m-d H:M:S'));
     // var formatted = dt.format('Y-m-d H:M:S');
     const userId = req.body.UserId;
-    const queryString = "INSERT INTO NewOrders(CustomerName,CustomerAddress,CustomerMobile,AgentName,OrderType,StartDate,EndDate,OrderDate,CallerName,EntryDate,UserId) VALUES (?,?,?,?,?,?,?,?,?,?,?)";
-    connection.query(queryString, [name, address, mobile, agentname, ordertype, startDate, endDate, orderDate, callerName, entrydate, userId], (err, results, fields) => {
+    const queryString = "INSERT INTO NewOrders(CustomerName,CustomerAddress,CustomerMobile,AgentName,OrderType,StartDate,EndDate,OrderDate,CallerName,EntryDate,UserId,CustomerSchemeId) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)";
+    connection.query(queryString, [name, address, mobile, agentname, ordertype, startDate, endDate, orderDate, callerName, entrydate, userId,customerschemeId], (err, results, fields) => {
         if (err) {
             console.log("failed to query for NewOrders: " + err);
             resp.sendStatus(500);
@@ -108,18 +126,18 @@ router.post("/neworders/filter", (req, resp) => {
     const startDate = req.body.StartDate;
     const endDate = req.body.EndDate;
 
-    let queryString = "SELECT * FROM NewOrders WHERE 1=1";
+    let queryString = "SELECT N.*,CASE WHEN C.CustomerScheme IS NULL THEN '' ELSE C.CustomerScheme END AS CustomerScheme FROM NewOrders N LEFT JOIN CustomerSchemes C ON N.CustomerSchemeId=C.CustomerSchemeId WHERE 1=1";
     if (agentname != '') {
-        queryString += " AND AgentName LIKE \'%" + agentname + "%\'";
+        queryString += " AND N.AgentName LIKE \'%" + agentname + "%\'";
     }
     if (callerName != '') {
-        queryString += " AND CallerName LIKE \'%" + callerName + "%\'";
+        queryString += " AND N.CallerName LIKE \'%" + callerName + "%\'";
     }
     if (startDate != undefined && startDate != null) {
-        queryString += " AND OrderDate >= STR_TO_DATE(\'" + new Date(startDate).toLocaleDateString()+"\', \'%Y-%m-%d\')";
+        queryString += " AND N.OrderDate >= STR_TO_DATE(\'" + new Date(startDate).toLocaleDateString()+"\', \'%Y-%m-%d\')";
     }
     if (endDate != undefined && endDate != null) {
-        queryString += " AND OrderDate <= STR_TO_DATE(\'" + new Date(endDate).toLocaleDateString()+"\', \'%Y-%m-%d\')";
+        queryString += " AND N.OrderDate <= STR_TO_DATE(\'" + new Date(endDate).toLocaleDateString()+"\', \'%Y-%m-%d\')";
     }
         console.log(queryString);
         connection.query(queryString, [], (err, results, fields) => {
@@ -146,14 +164,16 @@ router.post("/neworders/edit", (req, resp) => {
     const orderDate = req.body.OrderDate;
     var entrydate = req.body.EntryDate;
     var orderId = req.body.OrderId;
+    
+    const customerschemeId = req.body.CustomerSchemeId;
     // console.log(dt);
     // console.log(dt._now);
     // console.log( dt.format('Y-m-d H:M:S'));
     // var formatted = dt.format('Y-m-d H:M:S');
     const userId = req.body.UserId;
 
-    const queryString = "UPDATE NewOrders SET CustomerName=?,CustomerMobile=?,CustomerAddress=?,AgentName=?,OrderType=?,CallerName=?,StartDate=?,EndDate=?,OrderDate=?,EntryDate=? WHERE OrderId=?";
-    connection.query(queryString, [name, mobile, address, agentname, ordertype, callerName, startDate, endDate, orderDate, entrydate, orderId], (err, results, fields) => {
+    const queryString = "UPDATE NewOrders SET CustomerName=?,CustomerMobile=?,CustomerAddress=?,AgentName=?,OrderType=?,CallerName=?,StartDate=?,EndDate=?,OrderDate=?,EntryDate=?,CustomerSchemeId=? WHERE OrderId=?";
+    connection.query(queryString, [name, mobile, address, agentname, ordertype, callerName, startDate, endDate, orderDate, entrydate,customerschemeId, orderId], (err, results, fields) => {
         if (err) {
             console.log("failed to query for Order: " + err);
             resp.sendStatus(500);

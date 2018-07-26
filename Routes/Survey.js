@@ -107,22 +107,17 @@ router.post("/surveys/filter", (req, resp) => {
     const surveyorName = (req.body.SurveyorName == null || req.body.SurveyorName == undefined) ? '' : req.body.SurveyorName;
     const startDate = req.body.StartDate;
     const endDate = req.body.EndDate;
-    let queryString = "SELECT S.SurveyId,S.Place,S.AgencyName,S.AgencyAddress,S.AgencyMobile,S.ContactPerson,S.Details,A.AlreadyAgentOf,S.AgencyCreationDate,S.SurveyorName,S.UserId FROM Surveys S  " +
-                        "LEFT JOIN " +
-                        "(SELECT News.SurveyId,GROUP_CONCAT(News.NewsPaper SEPARATOR \',\') AS AlreadyAgentOf FROM " +
-                        "(SELECT T.SurveyId, N.NewsPaper FROM AgentNewsPaper T INNER JOIN NewsPapers N ON N.NewsPaperId=T.NewspaperId) " +
-                        "AS News GROUP BY News.SurveyId)  " +
-                        "AS A ON S.SurveyId=A.SurveyId WHERE 1=1";
-    //let queryString = "SELECT * FROM Surveys WHERE 1=1";
+
+    let queryString = "SELECT * FROM Surveys WHERE 1=1";
     if (surveyorName != '') {
-        queryString += " AND s.SurveyorName LIKE \'%" + surveyorName + "%\'";
+        queryString += " AND SurveyorName LIKE \'%" + surveyorName + "%\'";
     }
     
     if (startDate != undefined && startDate != null) {
-        queryString += " AND s.AgencyCreationDate >= STR_TO_DATE(\'" + new Date(startDate).toLocaleDateString()+"\', \'%Y-%m-%d\')";
+        queryString += " AND AgencyCreationDate >= STR_TO_DATE(\'" + new Date(startDate).toLocaleDateString()+"\', \'%Y-%m-%d\')";
     }
     if (endDate != undefined && endDate != null) {
-        queryString += " AND s.AgencyCreationDate <= STR_TO_DATE(\'" + new Date(endDate).toLocaleDateString()+"\', \'%Y-%m-%d\')";
+        queryString += " AND AgencyCreationDate <= STR_TO_DATE(\'" + new Date(endDate).toLocaleDateString()+"\', \'%Y-%m-%d\')";
     }
         console.log(queryString);
         connection.query(queryString, [], (err, results, fields) => {

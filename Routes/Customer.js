@@ -4,13 +4,13 @@ const creationDate = require('node-datetime');
 const router = express.Router();
 const global = require('../Common/Global.js');
 
-var objGlobal=new global();
+var objGlobal = new global();
 router.get("/customers", (req, res) => {
   // console.log(objGlobal.getConnection());
   const connection = objGlobal.getConnection();
   //console.log(connection);
   const queryString = "SELECT * FROM Customers"
-  
+
   connection.query(queryString, (err, rows, fields) => {
     if (err) {
       console.log("Failed to query for Customers: " + err)
@@ -75,6 +75,8 @@ router.post("/customers/add", (req, resp) => {
   const address = req.body.Address;
   const areaname = req.body.AreaName;
   const city = req.body.City;
+  const caller = (req.body.CallerName == null || req.body.CallerName == undefined) ? '' : req.body.CallerName;
+  const entrydate = req.body.EntryDate;
   var dt = creationDate.create();
   // console.log(dt);
   // console.log(dt._now);
@@ -83,8 +85,8 @@ router.post("/customers/add", (req, resp) => {
   const userId = req.body.UserId;
   // const queryString = "INSERT INTO Customers(CustomerName,Mobile,Email,Address,AreaName,City,CreationDate,UserId) VALUES (?,?,?,?,?,?,?,?)";
   // connection.query(queryString, [customerName, mobile, email, address, areaname, city,dt._now, userId], (err, results, fields) => {
-    const queryString = "INSERT INTO Customers(CustomerName,Mobile,AreaName,CreationDate,UserId) VALUES (?,?,?,?,?)";
-  connection.query(queryString, [customerName, mobile, areaname, dt._now, userId], (err, results, fields) => {
+  const queryString = "INSERT INTO Customers(CustomerName,Mobile,AreaName,CreationDate,UserId,CallerName,EntryDate) VALUES (?,?,?,?,?,?,?)";
+  connection.query(queryString, [customerName, mobile, areaname, dt._now, userId, caller, entrydate], (err, results, fields) => {
     if (err) {
       console.log("failed to query for Customers: " + err);
       resp.sendStatus(500);
@@ -105,14 +107,16 @@ router.post("/customers/edit", (req, resp) => {
   const address = req.body.Address;
   const areaname = req.body.AreaName;
   const city = req.body.City;
+  const caller = (req.body.CallerName == null || req.body.CallerName == undefined) ? '' : req.body.CallerName;
+  const entrydate = req.body.EntryDate;
   var dt = creationDate.create();
   // console.log(dt);
   // console.log(dt._now);
   // console.log( dt.format('Y-m-d H:M:S'));
   // var formatted = dt.format('Y-m-d H:M:S');
   const userId = req.body.userid;
-  const queryString = "UPDATE Customers SET CustomerName=?, Mobile=?, AreaName=? WHERE CustomerId=?";
-  connection.query(queryString, [customerName, mobile, areaname, customerid], (err, results, fields) => {
+  const queryString = "UPDATE Customers SET CustomerName=?, Mobile=?, AreaName=?, CallerName=?, EntryDate=? WHERE CustomerId=?";
+  connection.query(queryString, [customerName, mobile, areaname, caller, entrydate, customerid], (err, results, fields) => {
     if (err) {
       console.log("failed to query for Customers: " + err);
       resp.sendStatus(500);
