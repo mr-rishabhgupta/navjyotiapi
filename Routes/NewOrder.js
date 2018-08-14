@@ -134,10 +134,10 @@ router.post("/neworders/filter", (req, resp) => {
         queryString += " AND N.CallerName LIKE \'%" + callerName + "%\'";
     }
     if (startDate != undefined && startDate != null) {
-        queryString += " AND N.OrderDate >= STR_TO_DATE(\'" + new Date(startDate).toLocaleDateString()+"\', \'%Y-%m-%d\')";
+        queryString += " AND N.OrderDate >= STR_TO_DATE(\'" + new Date(startDate).toLocaleDateString()+"\', \'%m/%d/%Y\')";
     }
     if (endDate != undefined && endDate != null) {
-        queryString += " AND N.OrderDate <= STR_TO_DATE(\'" + new Date(endDate).toLocaleDateString()+"\', \'%Y-%m-%d\')";
+        queryString += " AND N.OrderDate <= STR_TO_DATE(\'" + new Date(endDate).toLocaleDateString()+"\', \'%m/%d/%Y\')";
     }
         console.log(queryString);
         connection.query(queryString, [], (err, results, fields) => {
