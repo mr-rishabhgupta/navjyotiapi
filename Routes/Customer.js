@@ -43,6 +43,47 @@ router.get("/customers/:id", (req, res) => {
   })
 })
 
+router.get("/customers/filter/:id", (req, res) => {
+  const connection = objGlobal.getConnection();
+  const userId = req.params.id;
+  var queryString = "SELECT * FROM Customers"
+  const queryString1 = "SELECT * FROM Users WHERE UserId="+userId;
+  console.log(userId);
+  connection.query(queryString1, [], (err1, results1, fields1) => {
+    console.log(queryString1);
+    if (err1) {
+      console.log("failed to query for Users: " + err1)
+      res.sendStatus(500)
+      return
+    } else if (results1 == null) {
+      console.log("No user found with the id: " + userId)
+      res.sendStatus(404)
+      return
+    } else {
+      console.log(results1[0]['RoleId']);
+      if (results1[0]['RoleId'] != 1) {
+        queryString += " WHERE UserId=" + userId;
+      }
+      console.log(queryString)
+      connection.query(queryString, [], (err, rows, fields) => {
+        if (err) {
+          console.log("failed to query for Customers: " + err)
+          res.sendStatus(500)
+          return
+        } else if (rows == null) {
+          console.log("No customer found with the id: " + userId)
+          res.sendStatus(404)
+          return
+        }
+        //   const users = rows.map((row) => {
+        //     return {firstName: row.first_name, lastName: row.last_name}
+        //     })
+        res.json(rows)
+      })
+    }
+  })
+})
+
 
 router.delete("/customers/:id", (req, res) => {
   const connection = objGlobal.getConnection();
