@@ -43,11 +43,13 @@ router.get("/customers/:id", (req, res) => {
   })
 })
 
-router.get("/customers/filter/:id", (req, res) => {
+router.post("/customers/filter/:id", (req, res) => {
   const connection = objGlobal.getConnection();
   const userId = req.params.id;
-  var queryString = "SELECT * FROM Customers"
-  const queryString1 = "SELECT * FROM Users WHERE UserId="+userId;
+  const startDate = req.body.StartDate;
+  const endDate = req.body.EndDate;
+  var queryString = "SELECT * FROM Customers WHERE 1=1"
+  const queryString1 = "SELECT * FROM Users WHERE UserId=" + userId;
   console.log(userId);
   connection.query(queryString1, [], (err1, results1, fields1) => {
     console.log(queryString1);
@@ -62,7 +64,13 @@ router.get("/customers/filter/:id", (req, res) => {
     } else {
       console.log(results1[0]['RoleId']);
       if (results1[0]['RoleId'] != 1) {
-        queryString += " WHERE UserId=" + userId;
+        queryString += " AND UserId=" + userId;
+      }
+      if (startDate != undefined && startDate != null) {
+        queryString += " AND EntryDate >= STR_TO_DATE(\'" + new Date(startDate).toLocaleDateString() + "\', \'%m/%d/%Y\')"; // server date formate: %m/%d/%Y, local: %Y-%m-%d
+      }
+      if (endDate != undefined && endDate != null) {
+        queryString += " AND EntryDate <= STR_TO_DATE(\'" + new Date(endDate).toLocaleDateString() + "\', \'%m/%d/%Y\')";
       }
       console.log(queryString)
       connection.query(queryString, [], (err, rows, fields) => {
